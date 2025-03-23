@@ -19,6 +19,10 @@ public class RandomCsvGenerator {
     }
     
     public static void generateRandomCsv(String filename, int numRows) throws IOException {
+    	
+    	// 連番の初期値
+    	int id = 2018001;
+    	
         FileWriter writer = new FileWriter(filename);
         Random random = new Random();
         
@@ -27,19 +31,19 @@ public class RandomCsvGenerator {
         
         // データ行の生成
         for (int i = 0; i < numRows; i++) {
-            int id = 2018001 + i; // 2018001から始まる連番
+            id += i;
             
             StringBuilder line = new StringBuilder();
             line.append(id).append(",");
-            line.append(randomString(10)).append(",");
-            line.append(randomDepartment(random)).append(",");
-            line.append(randomDate(random)).append(",");
-            line.append(randomSalary(random)).append(",");
-            line.append(randomRating(random)).append(",");
-            line.append(random.nextInt(20)).append(",");
-            line.append(randomProject(random)).append(",");
-            line.append(randomSkills(random)).append(",");
-            line.append(randomString(20));
+            line.append(randomName(5, " ")).append(",");
+            line.append("").append(",");
+            line.append(randomDate(30)).append(",");
+            line.append("").append(",");
+            line.append("").append(",");
+            line.append("").append(",");
+            line.append("").append(",");
+            line.append("").append(",");
+            line.append("");
             
             writer.write(line.toString() + "\n");
         }
@@ -47,7 +51,25 @@ public class RandomCsvGenerator {
         writer.close();
     }
     
-    // ランダムな文字列を生成
+    /**
+     * 英字のランダムな名前を作ります
+     * 
+     * @param length : 姓名の長さ
+     * @param separator : 氏名間の文字
+     * @return
+     */
+    private static String randomName(int length, String separator) {
+    	String firstName = randomString(length);
+    	String familyName = randomString(length);
+    	return firstName + separator + familyName;
+    }
+    
+    /**
+     * ランダムな文字列を生成
+     * 
+     * @param length
+     * @return
+     */
     private static String randomString(int length) {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
@@ -61,53 +83,70 @@ public class RandomCsvGenerator {
         return sb.toString();
     }
     
-    // ランダムな部署を取得
-    private static String randomDepartment(Random random) {
-        String[] departments = {"営業", "開発", "人事", "総務", "経理"};
-        return departments[random.nextInt(departments.length)];
-    }
-    
-    // ランダムな日付を生成
-    private static String randomDate(Random random) {
-        int year = 2018 + random.nextInt(6); // 2018-2023
-        int month = 1 + random.nextInt(12);  // 1-12
-        int day = 1 + random.nextInt(28);    // 1-28
+    /**
+     *  ランダムな日付を生成
+     *  
+     * @param interval : 現在からさかのぼる期間（年）
+     * @return
+     */
+    private static String randomDate(int interval) {
+    	Random random = new Random();
+    	
+    	int nowYear = LocalDate.now().getYear();
+        int year = nowYear - random.nextInt(interval);
+        int month = 1 + random.nextInt(12);
+        int day = 1 + random.nextInt(28);
         
         LocalDate date = LocalDate.of(year, month, day);
         return date.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
     }
     
-    // ランダムな給与を生成
-    private static int randomSalary(Random random) {
-        return 200000 + random.nextInt(600001); // 200000-800000
+    /**
+     * TODO 指定した期間の中でランダムな日付を返す
+     * 
+     * @param random
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private static String randomDate(String startDate, String endDate) {
+    	Random random = new Random();
+    	return "";
     }
     
-    // ランダムな評価を取得
-    private static String randomRating(Random random) {
-        String[] ratings = {"A", "B", "C", "D", "S"};
-        return ratings[random.nextInt(ratings.length)];
+    /**
+     * 配列からランダムな値を取得
+     * 
+     * @param random
+     * @return
+     */
+    private static String choiceWord(String[] words) {
+    	Random random = new Random();
+        return words[random.nextInt(words.length)];
     }
     
-    // ランダムなプロジェクトを取得
-    private static String randomProject(Random random) {
-        String[] projects = {"Alpha", "Beta", "Gamma", "Delta", "Epsilon"};
-        return projects[random.nextInt(projects.length)];
-    }
-    
-    // ランダムなスキルを生成
-    private static String randomSkills(Random random) {
-        String[] skills = {"Python", "Java", "SQL", "Excel", "C#", "JavaScript"};
-        int numSkills = 1 + random.nextInt(3); // 1-3個のスキル
+    /**
+     * 配列からランダムな値を指定した数だけ取得
+     * i.g. "A,C,B"
+     * 
+     * @param random
+     * @param words
+     * @param num 
+     * @return
+     */
+    private static String choiceSomeWords(String[] words, int num) {
+    	Random random = new Random();
+        int numWords = 1 + random.nextInt(num);
         
         StringBuilder sb = new StringBuilder();
         
-        for (int i = 0; i < numSkills; i++) {
+        for (int i = 0; i < numWords; i++) {
             if (i > 0) {
                 sb.append(",");
             }
-            sb.append(skills[random.nextInt(skills.length)]);
+            sb.append(words[random.nextInt(words.length)]);
         }
         
-        return "\"" + sb.toString() + "\""; // カンマを含むため引用符で囲む
+        return "\"" + sb.toString() + "\"";
     }
 }
