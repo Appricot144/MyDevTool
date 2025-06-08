@@ -1,5 +1,3 @@
-package TaskAnalyzer;
-
 import java.time.LocalDate;
 
 public class Task {

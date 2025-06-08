@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug TaskAnalyzer",
+      "request": "launch",
+      "mainClass": "Main",
+      "projectName": "task-analyzer",
+      "cwd": "${workspaceFolder}",
+      "vmArgs": "-Dfile.encoding=UTF-8",
+      "env": {
+        "JAVA_HOME": "C:\\Program Files\\Java\\jdk-21"
+      },
+      "sourcePaths": ["./src"],
+      "classPaths": [
+        "${workspaceFolder}/target/classes",
+        "${workspaceFolder}/target/dependency/*"
+      ],
+      "args": ["C:\\Users\\habar\\obsidian-note\\note\\Daily"]
+    }
+  ]
+}

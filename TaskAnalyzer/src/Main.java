@@ -1,5 +1,3 @@
-package TaskAnalyzer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +8,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Usage: java Main <DirectoryPath>");
+            System.out.println("Usage: java -jar <jar> <DirectoryPath>");
             return;
         }
 
