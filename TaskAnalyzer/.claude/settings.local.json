@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn:*)",
+      "Bash(java:*)",
+      "Bash(apt list:*)",
+      "Bash(apt search:*)"
+    ],
+    "deny": []
+  }
+}

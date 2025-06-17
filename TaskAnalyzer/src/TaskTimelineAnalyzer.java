@@ -34,6 +34,33 @@ public class TaskTimelineAnalyzer {
         return result;
     }
 
+    public Map<String, Set<String>> getUniqueTasksByCategory() {
+        Map<String, Set<String>> result = new TreeMap<>();
+        
+        Map<String, List<Task>> tasksByCategory = allTasks.stream()
+            .collect(Collectors.groupingBy(Task::getCategory));
+
+        for (Map.Entry<String, List<Task>> entry : tasksByCategory.entrySet()) {
+            String category = entry.getKey();
+            List<Task> tasks = entry.getValue();
+            
+            Set<String> uniqueTasks = tasks.stream()
+                .map(task -> task.getTitle().toLowerCase())
+                .collect(Collectors.toSet());
+            
+            result.put(category, uniqueTasks);
+        }
+        
+        return result;
+    }
+
+    public int getTotalUniqueTaskCount() {
+        return allTasks.stream()
+            .map(task -> task.getTitle().toLowerCase())
+            .collect(Collectors.toSet())
+            .size();
+    }
+
     public void printTimelineReport() {
         Map<String, Map<LocalDate, Integer>> timeline = getCategoryTaskCountByDate();
         
@@ -65,6 +92,29 @@ public class TaskTimelineAnalyzer {
                 prevDate = date;
                 prevCount = count;
             }
+        }
+        
+        printSprintSummary();
+    }
+
+    public void printSprintSummary() {
+        System.out.println("\n\nスプリントサマリ");
+        System.out.println("================");
+        
+        int totalUniqueTasks = getTotalUniqueTaskCount();
+        System.out.println("総タスク数: " + totalUniqueTasks);
+        
+        System.out.println("\nカテゴリ別タスク一覧:");
+        Map<String, Set<String>> uniqueTasksByCategory = getUniqueTasksByCategory();
+        
+        for (Map.Entry<String, Set<String>> entry : uniqueTasksByCategory.entrySet()) {
+            String category = entry.getKey();
+            Set<String> tasks = entry.getValue();
+            
+            System.out.println("\n[" + category + "] (" + tasks.size() + "件)");
+            tasks.stream()
+                .sorted()
+                .forEach(task -> System.out.println("  - " + task));
         }
     }
 } 
