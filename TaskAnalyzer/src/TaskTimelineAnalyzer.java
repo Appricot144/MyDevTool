@@ -226,7 +226,7 @@ public class TaskTimelineAnalyzer {
     
     private void printTaskHierarchy(TaskHierarchy hierarchy, String prefix) {
         Task rootTask = hierarchy.getRoot();
-        System.out.println("  " + prefix + "〇 " + rootTask.getDate() + " : [" + 
+        System.out.println("  " + prefix + "●  " + rootTask.getDate() + " : [" + 
             (rootTask.isCompleted() ? "x" : " ") + "] " + rootTask.getTitle());
         
         List<Task> children = hierarchy.getChildren();
