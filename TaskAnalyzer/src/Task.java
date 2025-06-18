@@ -5,12 +5,22 @@ public class Task {
     private boolean completed;
     private LocalDate date;
     private String category;
+    private int indentLevel;
 
     public Task(String title, boolean completed, LocalDate date, String category) {
         this.title = title;
         this.completed = completed;
         this.date = date;
         this.category = category;
+        this.indentLevel = 0;
+    }
+
+    public Task(String title, boolean completed, LocalDate date, String category, int indentLevel) {
+        this.title = title;
+        this.completed = completed;
+        this.date = date;
+        this.category = category;
+        this.indentLevel = indentLevel;
     }
 
     // Getters
@@ -18,6 +28,7 @@ public class Task {
     public boolean isCompleted() { return completed; }
     public LocalDate getDate() { return date; }
     public String getCategory() { return category; }
+    public int getIndentLevel() { return indentLevel; }
 
     @Override
     public String toString() {

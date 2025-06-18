@@ -8,11 +8,23 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Usage: java -jar <jar> <DirectoryPath>");
+            System.out.println("Usage: java -jar <jar> [-d] <DirectoryPath>");
             return;
         }
 
-        String directoryPath = args[0];
+        boolean debugMode = false;
+        String directoryPath;
+        
+        // コマンドライン引数の解析
+        if (args.length >= 2 && args[0].equals("-d")) {
+            debugMode = true;
+            directoryPath = args[1];
+        } else if (args.length >= 2 && args[1].equals("-d")) {
+            debugMode = true;
+            directoryPath = args[0];
+        } else {
+            directoryPath = args[0];
+        }
         Path dir = Paths.get(directoryPath);
 
         try {
@@ -32,7 +44,7 @@ public class Main {
                 });
 
             // 時系列分析を実行
-            TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks);
+            TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks, debugMode);
             analyzer.printTimelineReport();
 
         } catch (IOException e) {
