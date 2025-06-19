@@ -6,6 +6,7 @@ public class Task {
     private LocalDate date;
     private String category;
     private int indentLevel;
+    private LocalDate firstAppearanceDate;
 
     public Task(String title, boolean completed, LocalDate date, String category) {
         this.title = title;
@@ -29,6 +30,12 @@ public class Task {
     public LocalDate getDate() { return date; }
     public String getCategory() { return category; }
     public int getIndentLevel() { return indentLevel; }
+    public LocalDate getFirstAppearanceDate() { return firstAppearanceDate; }
+    
+    // Setter
+    public void setFirstAppearanceDate(LocalDate firstAppearanceDate) {
+        this.firstAppearanceDate = firstAppearanceDate;
+    }
 
     @Override
     public String toString() {

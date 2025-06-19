@@ -133,56 +133,52 @@ public class TaskTimelineAnalyzer {
     
     private List<Task> calculateDailyDifferences(List<Task> tasks) {
         List<Task> result = new ArrayList<>();
-        Map<LocalDate, Set<String>> tasksByDate = new TreeMap<>();
         
-        // 日付ごとにタスクタイトルをグループ化
-        for (Task task : tasks) {
-            tasksByDate.computeIfAbsent(task.getDate(), k -> new TreeSet<>())
-                .add(task.getTitle().toLowerCase());
-        }
+        // スプリント全体のユニークタスクを抽出
+        Set<String> uniqueTaskTitles = tasks.stream()
+            .map(t -> t.getTitle().toLowerCase())
+            .collect(Collectors.toSet());
         
-        Set<String> previousDayTasks = new TreeSet<>();
-        
-        for (Map.Entry<LocalDate, Set<String>> entry : tasksByDate.entrySet()) {
-            LocalDate date = entry.getKey();
-            Set<String> currentDayTasks = entry.getValue();
+        for (String taskTitle : uniqueTaskTitles) {
+            // このタスクタイトルに対応するすべてのタスクを取得
+            List<Task> sameTitleTasks = tasks.stream()
+                .filter(t -> t.getTitle().toLowerCase().equals(taskTitle))
+                .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
+                .collect(Collectors.toList());
             
-            // 前日にはなかった新しいタスクのみを追加
-            for (String taskTitle : currentDayTasks) {
-                if (!previousDayTasks.contains(taskTitle)) {
-                    // スプリント全体で最も完了状態のタスクを探す
-                    Task bestTask = tasks.stream()
-                        .filter(t -> t.getTitle().toLowerCase().equals(taskTitle))
-                        .max((a, b) -> {
-                            // 完了タスクを優先し、同じ完了状態なら最新の日付を優先
-                            if (a.isCompleted() != b.isCompleted()) {
-                                return a.isCompleted() ? 1 : -1;
-                            }
-                            return a.getDate().compareTo(b.getDate());
-                        })
-                        .orElse(null);
-                    
-                    if (bestTask != null) {
-                        // 新しいタスクオブジェクトを作成（初回出現日付を保持）
-                        Task firstAppearance = tasks.stream()
-                            .filter(t -> t.getTitle().toLowerCase().equals(taskTitle))
-                            .min((a, b) -> a.getDate().compareTo(b.getDate()))
-                            .orElse(bestTask);
-                        
-                        Task taskWithCompletionStatus = new Task(
-                            bestTask.getTitle(), 
-                            bestTask.isCompleted(), 
-                            firstAppearance.getDate(), 
-                            bestTask.getCategory(),
-                            firstAppearance.getIndentLevel()
-                        );
-                        result.add(taskWithCompletionStatus);
-                    }
-                }
+            if (!sameTitleTasks.isEmpty()) {
+                Task firstAppearance = sameTitleTasks.get(0);
+                
+                // スプリント全体で最も完了状態が良いタスクを探す
+                Task bestCompletionTask = sameTitleTasks.stream()
+                    .max((a, b) -> {
+                        // 完了タスクを優先し、同じ完了状態なら最新の日付を優先
+                        if (a.isCompleted() != b.isCompleted()) {
+                            return a.isCompleted() ? 1 : -1;
+                        }
+                        return a.getDate().compareTo(b.getDate());
+                    })
+                    .orElse(firstAppearance);
+                
+                // 完了タスクは完了日付、未完了タスクは初回出現日付を使用
+                LocalDate displayDate = bestCompletionTask.isCompleted() ? 
+                    bestCompletionTask.getDate() : firstAppearance.getDate();
+                
+                Task finalTask = new Task(
+                    bestCompletionTask.getTitle(),
+                    bestCompletionTask.isCompleted(),
+                    displayDate,
+                    bestCompletionTask.getCategory(),
+                    firstAppearance.getIndentLevel()
+                );
+                // ソート用に初回出現日を保持するために、別途追加情報を記録
+                finalTask.setFirstAppearanceDate(firstAppearance.getDate());
+                result.add(finalTask);
             }
-            
-            previousDayTasks = new TreeSet<>(currentDayTasks);
         }
+        
+        // タスクの初回出現日でソート
+        result.sort((a, b) -> a.getFirstAppearanceDate().compareTo(b.getFirstAppearanceDate()));
         
         return result;
     }
