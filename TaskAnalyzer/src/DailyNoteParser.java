@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class DailyNoteParser {
     private static final Pattern TASK_PATTERN = Pattern.compile("^(\\s*)- \\[([x ])\\] (.+)$");
-    private static final Pattern TODO_SECTION_PATTERN = Pattern.compile("^## Todo$");
+    private static final Pattern TODO_SECTION_PATTERN = Pattern.compile("^## todo$");
     private static final Pattern CATEGORY_PATTERN = Pattern.compile("^### (.+)$");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -25,14 +25,14 @@ public class DailyNoteParser {
 
         for (String line : lines) {
             String originalLine = line;
-            line = line.trim();
+            line = line.trim().toLowerCase();
             
             if (TODO_SECTION_PATTERN.matcher(line).find()) {
                 inTodoSection = true;
                 continue;
             }
             
-            if (line.startsWith("## ") && !line.equals("## Todo")) {
+            if (line.startsWith("## ") && !line.equals("## todo")) {
                 inTodoSection = false;
                 continue;
             }
@@ -41,7 +41,7 @@ public class DailyNoteParser {
                 continue;
             }
 
-            Matcher categoryMatcher = CATEGORY_PATTERN.matcher(line);
+            Matcher categoryMatcher = CATEGORY_PATTERN.matcher(originalLine);
             if (categoryMatcher.find()) {
                 currentCategory = categoryMatcher.group(1);
                 continue;
