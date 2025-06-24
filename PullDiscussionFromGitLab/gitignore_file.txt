@@ -1,0 +1,18 @@
+# GitLab TODO 自動化関連のセキュリティファイル
+config.json
+*.log
+todo_update.log
+
+# TODO ファイル（必要に応じてコメントアウト）
+# *.md
+
+# PowerShell 一時ファイル
+temp_*.json
+gitlab_discussions_temp.json
+
+# VS Code設定（個人設定の場合）
+# .vscode/settings.json
+
+# バックアップファイル
+*.bak
+*~

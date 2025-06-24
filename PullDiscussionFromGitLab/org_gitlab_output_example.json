@@ -1,0 +1,231 @@
+[
+  {
+    "project_id": 123,
+    "project_name": "web-application-frontend",
+    "project_url": "https://gitlab.company.com/team/web-application-frontend",
+    "merge_request_id": 456,
+    "merge_request_iid": 15,
+    "merge_request_title": "feat: ユーザー認証機能の実装",
+    "merge_request_url": "https://gitlab.company.com/team/web-application-frontend/-/merge_requests/15",
+    "merge_request_created_at": "2024-06-20T09:30:00.000Z",
+    "merge_request_state": "merged",
+    "discussions_count": 3,
+    "discussions": [
+      {
+        "id": "abc123def456",
+        "individual_note": false,
+        "notes": [
+          {
+            "id": 789,
+            "type": "DiffNote",
+            "body": "この部分でバリデーションエラーのハンドリングを追加した方が良いと思います。",
+            "author": {
+              "id": 101,
+              "username": "yamada_reviewer",
+              "name": "山田太郎",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/101/avatar.png"
+            },
+            "created_at": "2024-06-20T14:15:00.000Z",
+            "updated_at": "2024-06-20T14:15:00.000Z",
+            "system": false,
+            "noteable_id": 456,
+            "noteable_type": "MergeRequest",
+            "position": {
+              "base_sha": "abc123",
+              "start_sha": "def456",
+              "head_sha": "ghi789",
+              "old_path": "src/components/Login.tsx",
+              "new_path": "src/components/Login.tsx",
+              "position_type": "text",
+              "old_line": null,
+              "new_line": 45
+            },
+            "resolvable": true,
+            "resolved": true,
+            "resolved_by": {
+              "id": 50,
+              "username": "Aniline",
+              "name": "あなたの名前"
+            }
+          },
+          {
+            "id": 790,
+            "type": "DiffNote",
+            "body": "ご指摘ありがとうございます。try-catchブロックを追加しました。",
+            "author": {
+              "id": 50,
+              "username": "Aniline",
+              "name": "あなたの名前",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/50/avatar.png"
+            },
+            "created_at": "2024-06-20T15:30:00.000Z",
+            "updated_at": "2024-06-20T15:30:00.000Z",
+            "system": false,
+            "noteable_id": 456,
+            "noteable_type": "MergeRequest",
+            "position": {
+              "base_sha": "abc123",
+              "start_sha": "def456",
+              "head_sha": "ghi789",
+              "old_path": "src/components/Login.tsx",
+              "new_path": "src/components/Login.tsx",
+              "position_type": "text",
+              "old_line": null,
+              "new_line": 45
+            },
+            "resolvable": true,
+            "resolved": true
+          }
+        ]
+      },
+      {
+        "id": "xyz789abc123",
+        "individual_note": true,
+        "notes": [
+          {
+            "id": 791,
+            "type": "Note",
+            "body": "UIテストも完了しています。レビューよろしくお願いします。",
+            "author": {
+              "id": 50,
+              "username": "Aniline",
+              "name": "あなたの名前",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/50/avatar.png"
+            },
+            "created_at": "2024-06-20T16:00:00.000Z",
+            "updated_at": "2024-06-20T16:00:00.000Z",
+            "system": false,
+            "noteable_id": 456,
+            "noteable_type": "MergeRequest",
+            "resolvable": false,
+            "resolved": false
+          }
+        ]
+      },
+      {
+        "id": "def456ghi789",
+        "individual_note": true,
+        "notes": [
+          {
+            "id": 792,
+            "type": "Note",
+            "body": "LGTM! マージします。",
+            "author": {
+              "id": 102,
+              "username": "tanaka_lead",
+              "name": "田中花子",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/102/avatar.png"
+            },
+            "created_at": "2024-06-21T09:00:00.000Z",
+            "updated_at": "2024-06-21T09:00:00.000Z",
+            "system": false,
+            "noteable_id": 456,
+            "noteable_type": "MergeRequest",
+            "resolvable": false,
+            "resolved": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "project_id": 124,
+    "project_name": "web-application-backend",
+    "project_url": "https://gitlab.company.com/team/web-application-backend",
+    "merge_request_id": 457,
+    "merge_request_iid": 8,
+    "merge_request_title": "fix: SQLパフォーマンス改善",
+    "merge_request_url": "https://gitlab.company.com/team/web-application-backend/-/merge_requests/8",
+    "merge_request_created_at": "2024-06-18T13:45:00.000Z",
+    "merge_request_state": "opened",
+    "discussions_count": 2,
+    "discussions": [
+      {
+        "id": "performance_discussion_1",
+        "individual_note": false,
+        "notes": [
+          {
+            "id": 793,
+            "type": "DiffNote",
+            "body": "このクエリ、インデックスを追加する必要がありそうですね。",
+            "author": {
+              "id": 103,
+              "username": "sato_dba",
+              "name": "佐藤次郎",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/103/avatar.png"
+            },
+            "created_at": "2024-06-19T10:20:00.000Z",
+            "updated_at": "2024-06-19T10:20:00.000Z",
+            "system": false,
+            "noteable_id": 457,
+            "noteable_type": "MergeRequest",
+            "position": {
+              "base_sha": "old123",
+              "start_sha": "new456",
+              "head_sha": "head789",
+              "old_path": "src/main/resources/mapper/UserMapper.xml",
+              "new_path": "src/main/resources/mapper/UserMapper.xml",
+              "position_type": "text",
+              "old_line": 15,
+              "new_line": 15
+            },
+            "resolvable": true,
+            "resolved": false
+          },
+          {
+            "id": 794,
+            "type": "DiffNote",
+            "body": "ご指摘の通りです。user_id と created_at の複合インデックスを追加するマイグレーションを作成します。",
+            "author": {
+              "id": 50,
+              "username": "Aniline",
+              "name": "あなたの名前",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/50/avatar.png"
+            },
+            "created_at": "2024-06-19T11:15:00.000Z",
+            "updated_at": "2024-06-19T11:15:00.000Z",
+            "system": false,
+            "noteable_id": 457,
+            "noteable_type": "MergeRequest",
+            "position": {
+              "base_sha": "old123",
+              "start_sha": "new456",
+              "head_sha": "head789",
+              "old_path": "src/main/resources/mapper/UserMapper.xml",
+              "new_path": "src/main/resources/mapper/UserMapper.xml",
+              "position_type": "text",
+              "old_line": 15,
+              "new_line": 15
+            },
+            "resolvable": true,
+            "resolved": false
+          }
+        ]
+      },
+      {
+        "id": "system_note_discussion",
+        "individual_note": true,
+        "notes": [
+          {
+            "id": 795,
+            "type": "Note",
+            "body": "パフォーマンステストの結果：\n- 実行時間: 2.3s → 0.8s\n- CPUメモリ使用量: 30%削減\n\n詳細は添付のレポートをご確認ください。",
+            "author": {
+              "id": 50,
+              "username": "Aniline",
+              "name": "あなたの名前",
+              "avatar_url": "https://gitlab.company.com/uploads/-/system/user/avatar/50/avatar.png"
+            },
+            "created_at": "2024-06-19T16:30:00.000Z",
+            "updated_at": "2024-06-19T16:30:00.000Z",
+            "system": false,
+            "noteable_id": 457,
+            "noteable_type": "MergeRequest",
+            "resolvable": false,
+            "resolved": false
+          }
+        ]
+      }
+    ]
+  }
+]

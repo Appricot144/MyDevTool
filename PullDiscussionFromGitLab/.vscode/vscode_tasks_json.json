@@ -1,0 +1,170 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "GitLab → TODO更新 (全プロジェクト)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/GitLab-To-Todo.ps1",
+                "-GitLabUrl",
+                "https://your-gitlab.com",
+                "-AccessToken",
+                "your-access-token-here",
+                "-TodoDirectory",
+                "${workspaceFolder}",
+                "-AllProjects",
+                "-RecentOnly",
+                "-RecentDays",
+                "7"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "GitLab → TODO更新 (未解決のみ)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/GitLab-To-Todo.ps1",
+                "-GitLabUrl",
+                "https://your-gitlab.com",
+                "-AccessToken",
+                "your-access-token-here",
+                "-TodoDirectory",
+                "${workspaceFolder}",
+                "-AllProjects",
+                "-UnresolvedOnly"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new",
+                "clear": true
+            }
+        },
+        {
+            "label": "GitLab → TODO更新 (特定プロジェクト)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/GitLab-To-Todo.ps1",
+                "-GitLabUrl",
+                "https://your-gitlab.com",
+                "-AccessToken",
+                "your-access-token-here",
+                "-TodoDirectory",
+                "${workspaceFolder}",
+                "-ProjectId",
+                "${input:projectId}"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            }
+        },
+        {
+            "label": "GitLab → TODO更新 (期間指定)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/GitLab-To-Todo.ps1",
+                "-GitLabUrl",
+                "https://your-gitlab.com",
+                "-AccessToken",
+                "your-access-token-here",
+                "-TodoDirectory",
+                "${workspaceFolder}",
+                "-AllProjects",
+                "-StartDate",
+                "${input:startDate}",
+                "-EndDate",
+                "${input:endDate}"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "GitLab → TODO更新 (テスト実行)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/scripts/GitLab-To-Todo.ps1",
+                "-GitLabUrl",
+                "https://your-gitlab.com",
+                "-AccessToken",
+                "your-access-token-here",
+                "-TodoDirectory",
+                "${workspaceFolder}",
+                "-AllProjects",
+                "-RecentOnly",
+                "-DryRun"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "clear": true
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "projectId",
+            "description": "GitLabプロジェクトID",
+            "default": "123",
+            "type": "promptString"
+        },
+        {
+            "id": "startDate",
+            "description": "開始日 (yyyy-MM-dd)",
+            "default": "2024-06-01",
+            "type": "promptString"
+        },
+        {
+            "id": "endDate",
+            "description": "終了日 (yyyy-MM-dd)",
+            "default": "2024-06-30",
+            "type": "promptString"
+        }
+    ]
+}

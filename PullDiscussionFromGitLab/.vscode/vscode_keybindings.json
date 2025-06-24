@@ -1,0 +1,20 @@
+[
+    {
+        "key": "ctrl+shift+g ctrl+shift+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "GitLab → TODO更新 (全プロジェクト)",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+g ctrl+shift+u",
+        "command": "workbench.action.tasks.runTask",
+        "args": "GitLab → TODO更新 (未解決のみ)",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+g ctrl+shift+d",
+        "command": "workbench.action.tasks.runTask",
+        "args": "GitLab → TODO更新 (テスト実行)",
+        "when": "editorTextFocus"
+    }
+]

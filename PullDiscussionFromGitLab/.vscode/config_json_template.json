@@ -1,0 +1,24 @@
+{
+    "gitlab": {
+        "url": "https://your-gitlab.com",
+        "access_token": "your-personal-access-token-here",
+        "username": "Aniline"
+    },
+    "todo": {
+        "directory": ".",
+        "default_recent_days": 7,
+        "auto_add_unresolved_only": true
+    },
+    "priorities": {
+        "urgent_keywords": ["urgent", "緊急", "至急", "asap", "重要"],
+        "bug_keywords": ["fix", "修正", "バグ", "bug", "error", "エラー"],
+        "review_keywords": ["review", "レビュー", "確認"],
+        "emoji": {
+            "urgent": "🔥",
+            "bug": "🐛",
+            "review": "👀",
+            "code": "💻",
+            "default": "📋"
+        }
+    }
+}
