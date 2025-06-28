@@ -15,7 +15,6 @@ public class TaskOrderedTreeManager {
         
         public void addChild(TaskOrderedTree child) {
             children.add(child);
-            // TODO chileren をorderでsort
         }
         
         public TaskOrderedTree findChild(Task task) {
@@ -25,21 +24,33 @@ public class TaskOrderedTreeManager {
                 .orElse(null);
         }
         
-        public void updateTaskCompleted(boolean completed) {
-            this.task = new Task(
-                this.task.getTitle(),
-                completed,
-                this.task.getDate(),
-                this.task.getCategory(),
-                this.task.getIndentLevel()
-            );
-            this.task.setFirstAppearanceDate(this.task.getFirstAppearanceDate());
+        public void replaceSubTree(TaskOrderedTree newTree) {
+            this.task = newTree.getTask();
+            this.children = newTree.getChildren();
         }
-        
+
+        /*
+         * childrenの中でpointと一致する要素の前にinsertsを挿入します
+         */
+        public void insertSomeChild(List<TaskOrderedTree> inserts, TaskOrderedTree point) {
+            int insertIndex = -1;
+            for (int i = 0; i < this.children.size(); i++) {
+                if (this.children.get(i).getTask().equals(point.getTask())) {
+                    insertIndex = i;
+                    break;
+                }
+            }
+            
+            this.children.addAll(insertIndex, inserts);
+        }
+
         // Getters
         public Task getTask() { return task; }
         public List<TaskOrderedTree> getChildren() { return children; }
         public int getOrder() { return order; }
+
+        // Setters
+        public void setTask(Task task) { this.task = task;}
     }
     
     public static TaskOrderedTree buildOrderedTree(List<Task> tasks) {
@@ -51,7 +62,6 @@ public class TaskOrderedTreeManager {
         Stack<TaskOrderedTree> parentStack = new Stack<>();
         parentStack.push(root);
         
-        // FIXME order の値が階層毎に振られていない。(親1,2,3,4 子1,2,3 孫1,2)
         for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.get(i);
             TaskOrderedTree newNode = new TaskOrderedTree(task, i);
@@ -61,14 +71,11 @@ public class TaskOrderedTreeManager {
                 parentStack.pop();
             }
             
-            if (parentStack.size() == task.getIndentLevel() + 1) {
-                parentStack.peek().addChild(newNode);
-                parentStack.push(newNode);
-            } else if (parentStack.size() < task.getIndentLevel() + 2) {
+            if (parentStack.size() < task.getIndentLevel() + 1) {
                 parentStack.peek().addChild(newNode);
                 parentStack.push(newNode);
             } else {
-                while (parentStack.size() > task.getIndentLevel() + 2) {
+                while (parentStack.size() > task.getIndentLevel() + 1) {
                     parentStack.pop();
                 }
                 parentStack.peek().addChild(newNode);
@@ -86,17 +93,25 @@ public class TaskOrderedTreeManager {
         if (newTree == null) {
             return baseTree;
         }
+
+        List<TaskOrderedTree> holds = new ArrayList<>();
         
         for (TaskOrderedTree newChild : newTree.getChildren()) {
             TaskOrderedTree existingChild = baseTree.findChild(newChild.getTask());
             
             if (existingChild != null) {
-                existingChild.updateTaskCompleted(newChild.getTask().isCompleted());
+                existingChild.setTask(newChild.getTask());
+                //holdsをnewChildの前に挿入
+                baseTree.insertSomeChild(holds, newChild);
+                holds.clear();
                 mergeOrderedTrees(existingChild, newChild);
             } else {
-                baseTree.addChild(copyTree(newChild));
+                holds.add(newChild);
             }
         }
+
+        // 一致するnodeがなければholdsを後ろに挿入
+        baseTree.getChildren().addAll(holds);
         
         return baseTree;
     }
@@ -110,39 +125,38 @@ public class TaskOrderedTreeManager {
     }
     
     public static void printOrderedTree(TaskOrderedTree tree, String prefix) {
-        if (tree.getTask() == null) {
-            for (TaskOrderedTree child : tree.getChildren()) {
-                printOrderedTree(child, prefix);
-            }
-            return;
-        }
-        
-        Task task = tree.getTask();
-        System.out.println(prefix + "●  " + task.getPrintString() + " " + tree.getOrder()); // debug + " " + tree.getOrder()
-        
         List<TaskOrderedTree> children = tree.getChildren();
+
+        if (tree.getTask() == null) {
+            System.out.println(prefix + "●  ");
+        }
+
         for (int i = 0; i < children.size(); i++) {
             TaskOrderedTree child = children.get(i);
             boolean isLast = (i == children.size() - 1);
             String childPrefix = isLast ? "└─ " : "├─ ";
             String nextPrefix = isLast ? "   " : "│  ";
             
-            printOrderedTreeChild(child, prefix + childPrefix, prefix + nextPrefix);
+            printOrderedTreeRecursive(child, prefix + childPrefix, prefix + nextPrefix);
         }
     }
     
-    private static void printOrderedTreeChild(TaskOrderedTree tree, String currentPrefix, String nextPrefix) {
+    private static void printOrderedTreeRecursive(TaskOrderedTree tree, String currentPrefix, String nextPrefix) {
         Task task = tree.getTask();
-        System.out.println(currentPrefix + task.getPrintString() + " " + tree.getOrder()); // debug + " " + tree.getOrder()
         
         List<TaskOrderedTree> children = tree.getChildren();
-        for (int i = 0; i < children.size(); i++) {
-            TaskOrderedTree child = children.get(i);
-            boolean isLast = (i == children.size() - 1);
-            String childPrefix = isLast ? "└─ " : "├─ ";
-            String childNextPrefix = isLast ? "   " : "│  ";
-            
-            printOrderedTreeChild(child, nextPrefix + childPrefix, nextPrefix + childNextPrefix);
+        if (children.isEmpty()) {
+            System.out.println(currentPrefix + task.getPrintString());
+        } else {
+            System.out.println(currentPrefix + task.getPrintString());
+            for (int i = 0; i < children.size(); i++) {
+                TaskOrderedTree child = children.get(i);
+                boolean isLast = (i == children.size() - 1);
+                String childPrefix = isLast ? "└─ " : "├─ ";
+                String childNextPrefix = isLast ? "   " : "│  ";
+                
+                printOrderedTreeRecursive(child, nextPrefix + childPrefix, nextPrefix + childNextPrefix);
+            }
         }
     }
 }

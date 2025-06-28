@@ -6,14 +6,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * daily note の Taskを表すクラス
+ * daily note の Taskを表すクラス</br>
  * 
- * ステートフルなクラス。
- * first appearance は基本的にnullであり、全てのファイルの解析が完了した時にfirst appearance date がsetされることを期待している。
+ * ステートフルなクラス。</br>
+ * first appearance は基本的にnullであり、全てのファイルの解析が完了した時にfirst appearance date がsetされることを期待している。</br>
  * 
- * 同一タスクとみなす条件は `title` `category` `first appearance date` `indent level` が同一であるタスク。
- * タスクの完了状況、タスクが記録されているファイルの日付 にかかわらず、同一カテゴリ内の名前、最初に出現した日付、どのタスクの子であるかを判定して同一とみなす。
- * `Stream.distinct()` による重複削除を期待している。
+ * 同一タスクとみなす条件は `title` `category` `first appearance date` `indent level` が同一であるタスク。</br>
+ * タスクの完了状況、タスクが記録されているファイルの日付 にかかわらず、同一カテゴリ内の名前、最初に出現した日付、どのタスクの子であるかを判定して同一とみなす。</br>
+ * `Stream.distinct()` による重複削除を期待している。</br>
  */
 public class Task {
     private String title;

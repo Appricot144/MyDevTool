@@ -118,10 +118,13 @@ public class TaskTimelineAnalyzer {
             String category = entry.getKey();
             List<Task> tasks = entry.getValue();
             
-            List<Task> mergedTasks = mergeTasks(tasks);
+            List<Task> mergedTasks = mergeTasks(tasks); // category毎の数を数えることにしか使ってない
             
             Map<LocalDate, List<Task>> tasksByDate = tasks.stream()
                 .collect(Collectors.groupingBy(Task::getDate, TreeMap::new, Collectors.toList()));
+            
+            // FIXME: 暫定対応 mergedTasksのfirstAppearanceDateでtasksByDateのタスクを上書き
+            updateFirstAppearanceDates(tasksByDate, mergedTasks);
             
             TaskOrderedTreeManager.TaskOrderedTree categoryTree = null;
             
@@ -144,12 +147,9 @@ public class TaskTimelineAnalyzer {
         }
     }
     
-    
     /**
      * スプリント内で発生したタスクを重複を除外し、カテゴリ内で発生したタスクの総体を返す
      * 副作用:解析結果に first appearance date を付ける
-     * 
-     * TODO ファイル内での位置を保持する
      */
     private List<Task> mergeTasks(List<Task> tasks) {
         List<Task> result = new ArrayList<>();
@@ -181,6 +181,35 @@ public class TaskTimelineAnalyzer {
         }
         
         return result;
+    }
+    
+    /**
+     * FIXME: 暫定対応です。機能自体は動いていますが、更新タイミングは考えること
+     * 
+     * mergedTasksのfirstAppearanceDateでtasksByDate内の対応するタスクのfirstAppearanceDateを更新する
+     * タスクの同一条件: title, indentLevel, categoryが同一
+     */
+    private void updateFirstAppearanceDates(Map<LocalDate, List<Task>> tasksByDate, List<Task> mergedTasks) {
+        for (Map.Entry<LocalDate, List<Task>> dateEntry : tasksByDate.entrySet()) {
+            List<Task> dailyTasks = dateEntry.getValue();
+            
+            for (Task dailyTask : dailyTasks) {
+                // mergedTasksから対応するタスクを検索
+                Task correspondingMergedTask = mergedTasks.stream()
+                    .filter(mergedTask -> 
+                        mergedTask.getTitle().equals(dailyTask.getTitle()) &&
+                        mergedTask.getIndentLevel() == dailyTask.getIndentLevel() &&
+                        mergedTask.getCategory().equals(dailyTask.getCategory())
+                    )
+                    .findFirst()
+                    .orElse(null);
+                
+                // 対応するmergedTaskが見つかった場合、firstAppearanceDateを更新
+                if (correspondingMergedTask != null && correspondingMergedTask.getFirstAppearanceDate() != null) {
+                    dailyTask.setFirstAppearanceDate(correspondingMergedTask.getFirstAppearanceDate());
+                }
+            }
+        }
     }
     
     
