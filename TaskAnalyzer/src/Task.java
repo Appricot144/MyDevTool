@@ -82,7 +82,7 @@ public class Task {
     }
 
     public String getPrintString() {
-        return String.format("%s : [%s] %s", firstAppearanceDate, (completed ? "x" : " "), title);
+        return String.format("[%s] : [%s] %s", firstAppearanceDate, (completed ? "x" : " "), title);
     }
 
     /**

@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -13,9 +14,14 @@ public class Main {
         }
 
         boolean debugMode = false;
+        boolean mode = false;
         String directoryPath;
         
         // コマンドライン引数の解析
+        if (args.length >= 2 && Arrays.asList(args).contains("--experimental-mode")){
+            mode = true;
+        }
+
         if (args.length >= 2 && args[0].equals("-d")) {
             debugMode = true;
             directoryPath = args[1];
@@ -44,7 +50,7 @@ public class Main {
                 });
 
             // 時系列分析を実行
-            TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks, debugMode);
+            TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks, debugMode, mode);
             analyzer.printTimelineReport();
 
         } catch (IOException e) {

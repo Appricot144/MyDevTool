@@ -12,25 +12,33 @@ public class TaskOrderedTreeManager {
             this.children = new ArrayList<>();
             this.order = order;
         }
-        
+        /**
+         * children の末尾に child を追加する
+         * @param child
+         */
         public void addChild(TaskOrderedTree child) {
             children.add(child);
         }
         
+        /**
+         * children から task と equals true となる child を返す
+         * @param task
+         * @return -- found a child
+         */
         public TaskOrderedTree findChild(Task task) {
             return children.stream()
                 .filter(child -> child.task.equals(task))
                 .findFirst()
                 .orElse(null);
         }
-        
-        public void replaceSubTree(TaskOrderedTree newTree) {
-            this.task = newTree.getTask();
-            this.children = newTree.getChildren();
-        }
 
-        /*
-         * childrenの中でpointと一致する要素の前にinsertsを挿入します
+        /**
+         * childrenの中でpointと一致する要素の前にinsertsを挿入</br>
+         * children: [... , inserts..., point, ...]
+         *
+         * @param inserts -- nodes to inserts
+         * @param point -- insert point
+         * @return
          */
         public void insertSomeChild(List<TaskOrderedTree> inserts, TaskOrderedTree point) {
             int insertIndex = -1;
@@ -86,6 +94,15 @@ public class TaskOrderedTreeManager {
         return root;
     }
     
+    /**
+     * baseTree に newTree を merge</br>
+     * Task.equals を条件に同一とみなす</br>
+     * merge 処理は再帰的に実行される
+     * 
+     * @param baseTree
+     * @param newTree
+     * @return -- merged tree
+     */
     public static TaskOrderedTree mergeOrderedTrees(TaskOrderedTree baseTree, TaskOrderedTree newTree) {
         if (baseTree == null) {
             return newTree;
@@ -116,6 +133,11 @@ public class TaskOrderedTreeManager {
         return baseTree;
     }
     
+    /**
+     * TaskOrderedTree をコピーして返す
+     * @param source
+     * @return -- copied tree
+     */
     public static TaskOrderedTree copyTree(TaskOrderedTree source) {
         TaskOrderedTree copy = new TaskOrderedTree(source.getTask(), source.getOrder());
         for (TaskOrderedTree child : source.getChildren()) {
@@ -124,19 +146,28 @@ public class TaskOrderedTreeManager {
         return copy;
     }
     
-    public static void printOrderedTree(TaskOrderedTree tree, String prefix) {
+    /**
+     * TaskOrderedTreeの出力
+     * @param tree
+     * @param prefix
+     */
+    public static void printOrderedTree(TaskOrderedTree tree, String prefix, boolean experimenalMode) {
         List<TaskOrderedTree> children = tree.getChildren();
 
         if (tree.getTask() == null) {
-            System.out.println(prefix + "●  ");
+            System.out.println(prefix + "●");
         }
 
         for (int i = 0; i < children.size(); i++) {
             TaskOrderedTree child = children.get(i);
             boolean isLast = (i == children.size() - 1);
-            String childPrefix = isLast ? "└─ " : "├─ ";
-            String nextPrefix = isLast ? "   " : "│  ";
+            String childPrefix = isLast ? "└─"  : "├─";
+            String nextPrefix = isLast ?  "   " : "│  ";
             
+            if(experimenalMode){
+                // System.out.println(prefix + "│ " + "---------------------------------------------------");
+                System.out.println(prefix + "│ ");
+            }
             printOrderedTreeRecursive(child, prefix + childPrefix, prefix + nextPrefix);
         }
     }
@@ -152,7 +183,7 @@ public class TaskOrderedTreeManager {
             for (int i = 0; i < children.size(); i++) {
                 TaskOrderedTree child = children.get(i);
                 boolean isLast = (i == children.size() - 1);
-                String childPrefix = isLast ? "└─ " : "├─ ";
+                String childPrefix = isLast     ? "└─"  : "├─";
                 String childNextPrefix = isLast ? "   " : "│  ";
                 
                 printOrderedTreeRecursive(child, nextPrefix + childPrefix, nextPrefix + childNextPrefix);

@@ -5,58 +5,38 @@ import java.util.stream.Collectors;
 public class TaskTimelineAnalyzer {
     private final List<Task> allTasks;
     private final boolean debugMode;
+    private final boolean experimenalMode;
 
     public TaskTimelineAnalyzer(List<Task> tasks) {
         this.allTasks = tasks;
         this.debugMode = false;
+        this.experimenalMode = false;
     }
     
-    public TaskTimelineAnalyzer(List<Task> tasks, boolean debugMode) {
+    public TaskTimelineAnalyzer(List<Task> tasks, boolean debugMode, boolean experimenalMode) {
         this.allTasks = tasks;
         this.debugMode = debugMode;
+        this.experimenalMode = experimenalMode;
     }
 
-    public Map<String, Map<LocalDate, Integer>> getCategoryTaskCountByDate() {
-        Map<String, Map<LocalDate, Integer>> result = new TreeMap<>();
-        
-        // カテゴリごとにタスクをグループ化
-        Map<String, List<Task>> tasksByCategory = allTasks.stream()
-            .collect(Collectors.groupingBy(Task::getCategory));
-
-        // 各カテゴリについて日付ごとのタスク数を計算
-        for (Map.Entry<String, List<Task>> entry : tasksByCategory.entrySet()) {
-            String category = entry.getKey();
-            List<Task> tasks = entry.getValue();
-
-            Map<LocalDate, Integer> dateCount = tasks.stream()
-                .collect(Collectors.groupingBy(
-                    Task::getDate,
-                    TreeMap::new,
-                    Collectors.collectingAndThen(Collectors.toList(), List::size)
-                ));
-
-            result.put(category, dateCount);
-        }
-
-        return result;
+    /**
+     * TODO allTasksをカテゴリ,日付毎のTask Listにして返す
+     * @return -- result map
+     */
+    public Map<String, Map<LocalDate, List<Task>>> getTaskByCategoryAndDate() {
+        return null;
     }
 
-    public Map<String, Set<String>> getUniqueTasksByCategory() {
-        Map<String, Set<String>> result = new TreeMap<>();
-        
-        Map<String, List<Task>> tasksByCategory = allTasks.stream()
-            .collect(Collectors.groupingBy(Task::getCategory));
-
-        for (Map.Entry<String, List<Task>> entry : tasksByCategory.entrySet()) {
-            String category = entry.getKey();
-            List<Task> tasks = entry.getValue();
-            
-            Set<String> uniqueTasks = tasks.stream()
-                .map(task -> task.getTitle().toLowerCase())
-                .collect(Collectors.toSet());
-            
-            result.put(category, uniqueTasks);
-        }
+    /**
+     * tasksを日付でMapする</br>
+     * 日付でソート(昇順)して返す
+     * @param tasks
+     * @return -- result map
+     */
+    public Map<LocalDate, List<Task>> getTaskByDate(List<Task> tasks) {
+        Map<LocalDate, List<Task>> result = tasks.stream()
+            .sorted(Comparator.comparing(Task::getDate, Comparator.reverseOrder()))
+            .collect(Collectors.groupingBy(Task::getDate, TreeMap::new, Collectors.toList()));
         
         return result;
     }
@@ -69,145 +49,108 @@ public class TaskTimelineAnalyzer {
     }
 
     public void printTimelineReport() {
-        printTaskNumWandering();
-        printOrderedSprintSummary();
-    }
+        System.out.println("\n\n");
 
-    public void printTaskNumWandering() {
-        Map<String, Map<LocalDate, Integer>> timeline = getCategoryTaskCountByDate();
-        
-        System.out.println("カテゴリ別タスク数推移レポート");
-        System.out.println("==========================");
-
-        for (Map.Entry<String, Map<LocalDate, Integer>> categoryEntry : timeline.entrySet()) {
-            String category = categoryEntry.getKey();
-            Map<LocalDate, Integer> dateCount = categoryEntry.getValue();
-
-            System.out.println("\nカテゴリ: " + category);
-            System.out.println("日付\t\tタスク数\t増減");
-
-            LocalDate prevDate = null;
-            int prevCount = 0;
-
-            for (Map.Entry<LocalDate, Integer> dateEntry : dateCount.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-                int count = dateEntry.getValue();
-                
-                String change = "";
-                if (prevDate != null) {
-                    int diff = count - prevCount;
-                    change = diff > 0 ? "+" + diff : String.valueOf(diff);
-                }
-
-                System.out.printf("%s\t%d\t%s%n", date, count, change);
-                
-                prevDate = date;
-                prevCount = count;
-            }
-        }
-    }
-    
-    public void printOrderedSprintSummary() {
-        System.out.println("\n\nスプリントサマリ");
-        System.out.println("================");
-        
         Map<String, List<Task>> tasksByCategory = allTasks.stream()
             .collect(Collectors.groupingBy(Task::getCategory));
         
         for (Map.Entry<String, List<Task>> entry : tasksByCategory.entrySet()) {
             String category = entry.getKey();
             List<Task> tasks = entry.getValue();
+            TaskOrderedTreeManager.TaskOrderedTree categoryTree = null;
+
+            // set first apparance date
+            List<Task> uniqueTasks = uniqueTasks(tasks);
+            updateFirstAppearanceDates(uniqueTasks);
             
-            List<Task> mergedTasks = mergeTasks(tasks); // category毎の数を数えることにしか使ってない
-            
+            // build task summary trees
             Map<LocalDate, List<Task>> tasksByDate = tasks.stream()
                 .collect(Collectors.groupingBy(Task::getDate, TreeMap::new, Collectors.toList()));
-            
-            // FIXME: 暫定対応 mergedTasksのfirstAppearanceDateでtasksByDateのタスクを上書き
-            updateFirstAppearanceDates(tasksByDate, mergedTasks);
-            
-            TaskOrderedTreeManager.TaskOrderedTree categoryTree = null;
-            
             for (Map.Entry<LocalDate, List<Task>> dateEntry : tasksByDate.entrySet()) {
-                List<Task> dailyTasks = dateEntry.getValue();
-                
-                TaskOrderedTreeManager.TaskOrderedTree dailyTree = TaskOrderedTreeManager.buildOrderedTree(dailyTasks);
-                if (debugMode) {
-                    System.out.println("\nDebug: Date:" + dateEntry.getKey());
-                    TaskOrderedTreeManager.printOrderedTree(dailyTree, " ");
-                }
+                TaskOrderedTreeManager.TaskOrderedTree dailyTree = TaskOrderedTreeManager.buildOrderedTree(dateEntry.getValue());
                 categoryTree = TaskOrderedTreeManager.mergeOrderedTrees(categoryTree, dailyTree);
             }
             
-            System.out.println("\n[" + category + "] (" + mergedTasks.size() + "件)");
-            
-            if (categoryTree != null) {
-                TaskOrderedTreeManager.printOrderedTree(categoryTree, "  ");
-            }
+            // print summary
+            printTaskNumWandering(category, tasks, "  ");
+            printOrderedSprintSummary(category, uniqueTasks.size(), categoryTree, "  ");
         }
+    }
+
+    public void printTaskNumWandering(String category, List<Task> tasks, String prefix) {
+        
+        System.out.println("\n[Category: " + category + "]");
+        System.out.println("==============================");
+        System.out.println(prefix + "Date\t\tTasks\tDiff");
+        
+        List<Task> prevTasks = null;
+        Map<LocalDate, List<Task>> tasksByDate = getTaskByDate(tasks);
+        for (Map.Entry<LocalDate, List<Task>> entry : tasksByDate.entrySet()) {
+            LocalDate date = entry.getKey();
+            List<Task> dailyTasks = entry.getValue();
+
+            int count = 0;
+            int change = 0;
+            
+            // merge tasks & count
+            if(prevTasks != null) {
+                List<Task> mergedTasks = new ArrayList<Task>();
+                mergedTasks.addAll(prevTasks);
+                mergedTasks.addAll(dailyTasks);
+                mergedTasks = uniqueTasks(mergedTasks);
+
+                count = mergedTasks.size();
+                change = count - prevTasks.size();
+                prevTasks = mergedTasks;
+            } else {
+                prevTasks = dailyTasks;
+                count = dailyTasks.size();
+            }
+
+            System.out.printf(prefix + "%s\t%d\t%s%n", date, count, (change <= 0 ? change : "+" + change) );
+        }
+    }
+
+    public void printOrderedSprintSummary(String category, int taskSize, TaskOrderedTreeManager.TaskOrderedTree categoryTree, String prefix) {
+        System.out.println(String.format("\n [%s](%s件)", category, taskSize));
+
+        if (categoryTree != null) {
+            TaskOrderedTreeManager.printOrderedTree(categoryTree, "  ", experimenalMode);
+        }
+
+        System.out.println();
     }
     
     /**
-     * スプリント内で発生したタスクを重複を除外し、カテゴリ内で発生したタスクの総体を返す
-     * 副作用:解析結果に first appearance date を付ける
+     * tasksの重複を除外して返す<br>
+     * カテゴリ、タスク名、インデントが同一のtaskを同一条件としてもつ</br>
+     * 
+     * @param tasks -- target
+     * @return -- unique tasks sorted by task date
      */
-    private List<Task> mergeTasks(List<Task> tasks) {
-        List<Task> result = new ArrayList<>();
+    private List<Task> uniqueTasks(List<Task> tasks) {
         List<Task> uniqueTasks = tasks.stream()
-            .filter(Task.distinctByKey(task -> 
-                task.getCategory() + ";" + task.getIndentLevel() + ";" + task.getTitle()
-                ))
+            .sorted((a,b) -> a.getDate().compareTo(b.getDate()))
+            .filter(Task.distinctByKey(task -> task.getCategory() + ";" + task.getIndentLevel() + ";" + task.getTitle()))
             .toList();
 
-        for (Task aTask : uniqueTasks) {
-            List<Task> sameTasks = tasks.stream()
-                .filter(task -> task.getTitle().equals(aTask.getTitle()) && task.getIndentLevel() == aTask.getIndentLevel())
-                .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
-                .toList();
-
-            Task firstAppearance = sameTasks.getFirst();
-            Task finalStateTask = sameTasks.getLast();
-            finalStateTask.setFirstAppearanceDate(firstAppearance.getDate());
-            
-            result.add(finalStateTask);
-        }
-
-        // DEBUG
-        if (debugMode) {
-            System.out.println("Debug: Task merge:");
-            result.stream().forEach(t -> {
-                System.out.println(t.toString());
-            });
-        }
-        
-        return result;
+        return uniqueTasks;
     }
     
     /**
-     * FIXME: 暫定対応です。機能自体は動いていますが、更新タイミングは考えること
-     * 
-     * mergedTasksのfirstAppearanceDateでtasksByDate内の対応するタスクのfirstAppearanceDateを更新する
+     * uniquesのfirstAppearanceDateでtasksByDate内の対応するタスクのfirstAppearanceDateを更新する</br>
      * タスクの同一条件: title, indentLevel, categoryが同一
      */
-    private void updateFirstAppearanceDates(Map<LocalDate, List<Task>> tasksByDate, List<Task> mergedTasks) {
-        for (Map.Entry<LocalDate, List<Task>> dateEntry : tasksByDate.entrySet()) {
-            List<Task> dailyTasks = dateEntry.getValue();
+    private void updateFirstAppearanceDates(List<Task> uniques) {
+        for (Task task : allTasks) {
+            LocalDate firstApparanceDate = uniques.stream()
+                .filter(t -> task.equals(t))
+                .findFirst()
+                .map(t -> t.getDate())
+                .orElse(null);
             
-            for (Task dailyTask : dailyTasks) {
-                // mergedTasksから対応するタスクを検索
-                Task correspondingMergedTask = mergedTasks.stream()
-                    .filter(mergedTask -> 
-                        mergedTask.getTitle().equals(dailyTask.getTitle()) &&
-                        mergedTask.getIndentLevel() == dailyTask.getIndentLevel() &&
-                        mergedTask.getCategory().equals(dailyTask.getCategory())
-                    )
-                    .findFirst()
-                    .orElse(null);
-                
-                // 対応するmergedTaskが見つかった場合、firstAppearanceDateを更新
-                if (correspondingMergedTask != null && correspondingMergedTask.getFirstAppearanceDate() != null) {
-                    dailyTask.setFirstAppearanceDate(correspondingMergedTask.getFirstAppearanceDate());
-                }
+            if (firstApparanceDate != null) {
+                task.setFirstAppearanceDate(firstApparanceDate);
             }
         }
     }

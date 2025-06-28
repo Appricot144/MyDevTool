@@ -19,7 +19,8 @@
       ],
       "args": [
         "-d",
-        "C:\\Users\\habar\\git\\MyDevTool\\TaskAnalyzer\\test_data_short"
+        "C:\\Users\\habar\\git\\MyDevTool\\TaskAnalyzer\\test_data\\test_data_short",
+        "--experimental-mode"
       ]
     }
   ]

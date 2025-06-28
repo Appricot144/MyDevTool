@@ -67,13 +67,12 @@ Shows task count changes by category over time:
 ### 2. Sprint Summary Reports
 Two versions are generated:
 
-**Traditional Sprint Summary**: Flat list of tasks grouped by category
-
 **Hierarchical Sprint Summary (Ordered Tree)**: Tree structure preserving parent-child relationships:
 ```
 [My Dev Tools] (8件)
   ●  2025-06-14 : [ ] 影響範囲検出器の実装
   └─ 2025-06-18 : [x] 機能整理
+     └─ 2025-06-18 : [x] いろいろ修正
   ●  2025-06-14 : [ ] task analyzer を作る
   ├─ 2025-06-18 : [x] 最親ノードを小カテゴリにする
   ├─ 2025-06-15 : [ ] スプリット間に出たタスク全体の達成推移
