@@ -24,10 +24,10 @@ public class Task {
     private LocalDate firstAppearanceDate;
 
     public Task(String title, boolean completed, LocalDate date, String category, int indentLevel) {
-        this.title = title;
+        this.title = title.trim();
         this.completed = completed;
         this.date = date;
-        this.category = category;
+        this.category = category.trim();
         this.indentLevel = indentLevel;
     }
 
@@ -57,7 +57,9 @@ public class Task {
             isSamefirstAppearance = this.firstAppearanceDate.equals(task.getFirstAppearanceDate());
         }
 
-        return this.title.equals(task.getTitle())
+        boolean isSameTitle = this.title.replaceAll("(^~~|~~$)", "").equals(task.getTitle().replaceAll("(^~~|~~$)", ""));
+        
+        return isSameTitle
         && this.category.equals(task.getCategory())
         && this.indentLevel == task.getIndentLevel()
         && isSamefirstAppearance;
