@@ -1,0 +1,20 @@
+{
+  "name": "gitlab-discussion",
+  "version": "1.0.0",
+  "description": "pull gitlab MR discussions",
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "axios": "^1.10.0",
+    "date-fns": "^4.1.0"
+  },
+  "dependencies": {
+    "@types/node": "^24.0.10"
+  }
+}

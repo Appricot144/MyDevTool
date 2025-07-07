@@ -1,0 +1,7 @@
+{
+  "gitlab": {
+    "url": "http://127.0.0.1:3000",
+    "access_token": "API-foo",
+    "username": "bar"
+  }
+}
