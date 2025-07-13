@@ -16,9 +16,9 @@ public class Main {
         boolean debugMode = false;
         boolean mode = false;
         String directoryPath;
-        
+
         // コマンドライン引数の解析
-        if (args.length >= 2 && Arrays.asList(args).contains("--experimental-mode")){
+        if (args.length >= 2 && Arrays.asList(args).contains("--experimental-mode")) {
             mode = true;
         }
 
@@ -35,27 +35,31 @@ public class Main {
 
         try {
             List<Task> allTasks = new ArrayList<>();
+            List<Memo> allMemos = new ArrayList<>();
             DailyNoteParser parser = new DailyNoteParser();
 
             // ディレクトリ内のすべての.mdファイルを処理
             Files.list(dir)
-                .filter(path -> path.toString().endsWith(".md"))
-                .forEach(path -> {
-                    try {
-                        allTasks.addAll(parser.parseNote(path));
-                    } catch (IOException e) {
-                        System.err.println("Error: Could't parse md file: " + path);
-                        e.printStackTrace();
-                    }
-                });
+                    .filter(path -> path.toString().endsWith(".md"))
+                    .forEach(path -> {
+                        try {
+                            DailyNoteParser.ParseResult result = parser.parseNote(path);
+                            allTasks.addAll(result.getTasks());
+                            allMemos.add(result.getMemo());
+                        } catch (IOException e) {
+                            System.err.println("Error: Could't parse md file: " + path);
+                            e.printStackTrace();
+                        }
+                    });
 
-            // 時系列分析を実行
             TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks, debugMode, mode);
+            MemoPrinter printer = new MemoPrinter();
             analyzer.printTimelineReport();
+            printer.printAllMemo(allMemos);
 
         } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
-} 
+}

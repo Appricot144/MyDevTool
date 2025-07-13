@@ -1,15 +1,21 @@
-public class Memo {
-    private String line;
+import java.time.LocalDate;
+import java.util.List;
 
-    public Memo(String line) {
-        this.line = line;
+public class Memo {
+    private List<String> lines;
+    private LocalDate date;
+
+    public Memo(List<String> lines, LocalDate date) {
+        this.lines = lines;
+        this.date = date;
     }
 
     // getter
-    public String getLine() { return this.line; }
+    public List<String> getLines() {
+        return this.lines;
+    }
 
-    // setter
-    public void setLine(String line) {
-        this.line = line;
+    public LocalDate getDate() {
+        return this.date;
     }
 }
