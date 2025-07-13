@@ -21,6 +21,7 @@ public class MemoPrinter {
             dailyLines.stream().forEach(line -> {
                 System.out.println(line);
             });
+            System.out.println("---");
         }
     }
 }
