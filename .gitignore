@@ -13,3 +13,6 @@ gitlab_discussions_temp.json
 *.bak
 
 *~
+
+*storybook.log
+storybook-static

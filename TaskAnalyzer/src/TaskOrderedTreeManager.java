@@ -52,11 +52,6 @@ public class TaskOrderedTreeManager {
                 }
             }
 
-            // TODO set color
-            // for (TaskOrderedTree insertTree : inserts) {
-            // insertTree.getTask().setColor(Task.TaskBgColor.ANSI_RED);
-            // }
-
             this.children.addAll(insertIndex, inserts);
         }
 

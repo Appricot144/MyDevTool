@@ -53,9 +53,9 @@ public class Main {
                     });
 
             TaskTimelineAnalyzer analyzer = new TaskTimelineAnalyzer(allTasks, debugMode, mode);
-            MemoPrinter printer = new MemoPrinter();
             analyzer.printTimelineReport();
-            printer.printAllMemo(allMemos);
+            // MemoPrinter printer = new MemoPrinter();
+            // printer.printAllMemo(allMemos);
 
         } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());

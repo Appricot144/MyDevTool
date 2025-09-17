@@ -25,8 +25,8 @@ public class Task {
     private String category;
     private int indentLevel;
 
-    // state full section !
-    // after inserted member s
+    // state-full section !
+    // after inserted members
     private LocalDate firstAppearanceDate;
     private String colorStr = "";
 
