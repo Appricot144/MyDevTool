@@ -1,13 +1,20 @@
 import { getFetcher } from "./fetcher";
 import type { ResDiscussion, ResMr } from "./response";
 
+/**
+ * 出力形式:
+ * ### Rv: project_name
+ * - [ ] (source.ts:85) [discuttion-url]
+ *  - コメント
+ */
+
 async function main() {
   let private_token = "";
   let server_url = "";
   let period: string = "2w";
   const username = "r_habata";
 
-  // コマンドライン引数の処理
+  // command line args
   const args = process.argv.slice(2);
   for (const [index, arg] of args.entries()) {
     switch (index) {
@@ -23,29 +30,31 @@ async function main() {
     }
   }
 
-  // get my MR list
+  // get user MR list
   let list_mr_url = `${server_url}/api/v4/merge_requests?author_username=${username}`;
   const mrList = await getFetcher<ResMr[]>(list_mr_url);
 
-  // get my MR discussions
-  const discussions = mrList.map(async (mr) => {
+  for (const mr of mrList) {
+    // get MR discussions
     const discussion_url = `${server_url}/api/v4/projects/${mr.project_id}/merge_requests/${mr.iid}/discussions`;
-    return await getFetcher<ResDiscussion[]>(discussion_url);
-  });
-  const outputItems = discussions.map((discussion) => {
-    // TODO ここでPromise型になる理由は？
-    return Array.from(discussion.notes).filter(
-      (note) => note.auther.username !== username
-    );
-  });
+    const items = (await getFetcher<ResDiscussion[]>(discussion_url))
+      .map((discussion) => discussion.notes)
+      .flat()
+      .filter((note) => note.author.username !== username);
 
-  // format output
+    // output discussions
+    console.log(`### Rv: ${mr.title}`);
+    items.forEach((item) => {
+      const source = item.position.new_path;
+      const line = item.position.new_line;
 
-  // output
-  /**
-   * 出力形式:
-   * ### Rv: project_name
-   * - [ ] (source.ts:85) [discuttion-url]
-   *  - コメント
-   */
+      console.log(
+        `- [ ] (${source}:L${line}) [${mr.web_url}/#note_${item.id}]`
+      );
+      console.log(` - ${item.body}`);
+    });
+    console.log("\n");
+  }
 }
+
+main();
