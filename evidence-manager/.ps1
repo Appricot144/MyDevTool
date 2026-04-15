@@ -42,6 +42,7 @@ if (!(Test-Path $saveFolder)) { New-Item -ItemType Directory -Path $saveFolder |
 # ============================================================
 $script:step      = 1
 $script:subStep   = 1
+$script:testItem  = 1
 $script:lastSeq   = [ClipboardHelper]::GetClipboardSequenceNumber()
 $script:thumbList = @()
 $script:thumbIndex = -1
@@ -51,7 +52,7 @@ $script:thumbIndex = -1
 # ============================================================
 $form = New-Object System.Windows.Forms.Form
 $form.Text            = "証跡キャプチャ"
-$form.Size            = New-Object System.Drawing.Size(520, 420)
+$form.Size            = New-Object System.Drawing.Size(520, 453)
 $form.TopMost         = $true
 $form.StartPosition   = "Manual"
 $form.Location        = New-Object System.Drawing.Point(10, 10)
@@ -63,21 +64,63 @@ $form.KeyPreview      = $true
 # 上部コントロールパネル
 # ============================================================
 $panel           = New-Object System.Windows.Forms.Panel
-$panel.Size      = New-Object System.Drawing.Size(520, 60)
+$panel.Size      = New-Object System.Drawing.Size(520, 95)
 $panel.Location  = New-Object System.Drawing.Point(0, 0)
 $panel.BackColor = [System.Drawing.Color]::White
 $form.Controls.Add($panel)
 
+# 試験項番ラベル
+$lblTestItem          = New-Object System.Windows.Forms.Label
+$lblTestItem.Text     = "試験項番:"
+$lblTestItem.Location = New-Object System.Drawing.Point(10, 12)
+$lblTestItem.Size     = New-Object System.Drawing.Size(65, 20)
+$panel.Controls.Add($lblTestItem)
+
+# 試験項番スピナー
+$numTestItem          = New-Object System.Windows.Forms.NumericUpDown
+$numTestItem.Location = New-Object System.Drawing.Point(78, 8)
+$numTestItem.Size     = New-Object System.Drawing.Size(60, 25)
+$numTestItem.Minimum  = 1
+$numTestItem.Maximum  = 9999
+$numTestItem.Value    = 1
+$panel.Controls.Add($numTestItem)
+
+$numTestItem.Add_ValueChanged({
+    $script:testItem = [int]$numTestItem.Value
+    $script:step    = 1
+    $script:subStep = 1
+    $numStep.Value  = 1
+    # サムネイルパネルをクリア（画像リソースを解放）
+    foreach ($ctrl in $thumbPanel.Controls) {
+        foreach ($child in $ctrl.Controls) {
+            if ($child -is [System.Windows.Forms.PictureBox] -and $child.Image -ne $null) {
+                $child.Image.Dispose()
+            }
+        }
+    }
+    $thumbPanel.Controls.Clear()
+    $script:thumbList  = @()
+    $script:thumbIndex = -1
+    # 新項番フォルダの既存画像を読み込む
+    $testFolder = "$saveFolder\$($script:testItem)"
+    if (Test-Path $testFolder) {
+        Get-ChildItem "$testFolder\*.png" | Sort-Object Name | ForEach-Object {
+            Add-Thumbnail $_.FullName ([System.IO.Path]::GetFileName($_.FullName))
+        }
+    }
+    $lblStatus.Text = "待機中… 次: 手順 $($script:step)-$($script:subStep)"
+})
+
 # 手順番号ラベル
 $lblStep          = New-Object System.Windows.Forms.Label
 $lblStep.Text     = "手順番号:"
-$lblStep.Location = New-Object System.Drawing.Point(10, 18)
+$lblStep.Location = New-Object System.Drawing.Point(10, 53)
 $lblStep.Size     = New-Object System.Drawing.Size(65, 20)
 $panel.Controls.Add($lblStep)
 
 # 手順番号スピナー
 $numStep          = New-Object System.Windows.Forms.NumericUpDown
-$numStep.Location = New-Object System.Drawing.Point(78, 14)
+$numStep.Location = New-Object System.Drawing.Point(78, 49)
 $numStep.Size     = New-Object System.Drawing.Size(60, 25)
 $numStep.Minimum  = 1
 $numStep.Maximum  = 9999
@@ -93,7 +136,7 @@ $numStep.Add_ValueChanged({
 # 監視ON/OFFボタン
 $btnToggle           = New-Object System.Windows.Forms.Button
 $btnToggle.Text      = "⏸ 監視停止"
-$btnToggle.Location  = New-Object System.Drawing.Point(155, 12)
+$btnToggle.Location  = New-Object System.Drawing.Point(155, 47)
 $btnToggle.Size      = New-Object System.Drawing.Size(120, 30)
 $btnToggle.BackColor = [System.Drawing.Color]::SteelBlue
 $btnToggle.ForeColor = [System.Drawing.Color]::White
@@ -117,7 +160,7 @@ $btnToggle.Add_Click({
 # ステータスラベル
 $lblStatus           = New-Object System.Windows.Forms.Label
 $lblStatus.Text      = "待機中… 次: 手順 1-1"
-$lblStatus.Location  = New-Object System.Drawing.Point(285, 18)
+$lblStatus.Location  = New-Object System.Drawing.Point(285, 53)
 $lblStatus.Size      = New-Object System.Drawing.Size(220, 20)
 $lblStatus.ForeColor = [System.Drawing.Color]::DarkBlue
 $panel.Controls.Add($lblStatus)
@@ -127,7 +170,7 @@ $panel.Controls.Add($lblStatus)
 # ============================================================
 $lblHint           = New-Object System.Windows.Forms.Label
 $lblHint.Text      = "Ctrl+↑↓: 手順変更    サムネイルクリック / Enter: 拡大表示（←→で順送り）"
-$lblHint.Location  = New-Object System.Drawing.Point(0, 62)
+$lblHint.Location  = New-Object System.Drawing.Point(0, 97)
 $lblHint.Size      = New-Object System.Drawing.Size(520, 18)
 $lblHint.TextAlign = "MiddleCenter"
 $lblHint.Font      = New-Object System.Drawing.Font("Arial", 7.5)
@@ -139,7 +182,7 @@ $form.Controls.Add($lblHint)
 # サムネイルエリア
 # ============================================================
 $thumbPanel              = New-Object System.Windows.Forms.FlowLayoutPanel
-$thumbPanel.Location     = New-Object System.Drawing.Point(0, 82)
+$thumbPanel.Location     = New-Object System.Drawing.Point(0, 117)
 $thumbPanel.Size         = New-Object System.Drawing.Size(504, 298)
 $thumbPanel.Anchor       = "Top,Bottom,Left,Right"
 $thumbPanel.AutoScroll   = $true
@@ -352,9 +395,12 @@ $timer.Add_Tick({
     if ($img -eq $null) { return }
 
     # 保存
-    $script:step = [int]$numStep.Value
-    $fileName    = "$($script:step)-$($script:subStep).png"
-    $filePath    = "$saveFolder\$fileName"
+    $script:step     = [int]$numStep.Value
+    $script:testItem = [int]$numTestItem.Value
+    $testFolder      = "$saveFolder\$($script:testItem)"
+    if (!(Test-Path $testFolder)) { New-Item -ItemType Directory -Path $testFolder | Out-Null }
+    $fileName        = "$($script:step)-$($script:subStep).png"
+    $filePath        = "$testFolder\$fileName"
     $img.Save($filePath)
     Add-Thumbnail $filePath $fileName
     $script:subStep++
